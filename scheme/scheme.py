@@ -53,10 +53,10 @@ def eval_all(expressions, env):
     if expressions == nil:
         return None
     while expressions.second != nil:
-        print(expressions.second)
-        return scheme_eval(expressions.second, env, True)
-    else:
-    # final_expres = 
+        # print(expressions.second)
+        scheme_eval(expressions.first, env, True)
+        return eval_all(expressions.second, env)
+    else: 
         return scheme_eval(expressions.first, env)
     # END PROBLEM 8
 
@@ -107,7 +107,14 @@ class Frame:
         """
         child = Frame(self) # Create a new child with self as the parent
         # BEGIN PROBLEM 11
-        "*** REPLACE THIS LINE ***"
+        # print(formals)
+        # print(vals)
+        # check_form(vals, len(formals), len(formals))
+        if len(formals) != len(vals):
+            raise SchemeError
+        while formals != nil:
+            child.define(formals.first, vals.first)
+            formals, vals = formals.second, vals.second
         # END PROBLEM 11
         return child
 
@@ -219,7 +226,9 @@ def do_define_form(expressions, env):
         # END PROBLEM 6
     elif isinstance(target, Pair) and scheme_symbolp(target.first):
         # BEGIN PROBLEM 10
-        "*** REPLACE THIS LINE ***"
+        # print(expressions)
+        env.define(target.first, do_lambda_form(Pair(target.second, expressions.second), env))
+        return target.first
         # END PROBLEM 10
     else:
         bad_target = target.first if isinstance(target, Pair) else target
@@ -243,7 +252,8 @@ def do_lambda_form(expressions, env):
     formals = expressions.first
     check_formals(formals)
     # BEGIN PROBLEM 9
-    "*** REPLACE THIS LINE ***"
+    # print(expressions)
+    return LambdaProcedure(formals, expressions.second, env)
     # END PROBLEM 9
 
 def do_if_form(expressions, env):
