@@ -31,7 +31,10 @@ def scheme_eval(expr, env, _=None): # Optional third argument is ignored
         return SPECIAL_FORMS[first](rest, env)
     else:
         # BEGIN PROBLEM 5
-        "*** REPLACE THIS LINE ***"
+        operator = env.lookup(first)
+        check_procedure(operator)
+        operands = rest.map(lambda x: scheme_eval(x, env))
+        return scheme_apply(operator, operands, env)
         # END PROBLEM 5
 
 def self_evaluating(expr):
@@ -72,13 +75,16 @@ class Frame:
     def define(self, symbol, value):
         """Define Scheme SYMBOL to have VALUE."""
         # BEGIN PROBLEM 3
-        "*** REPLACE THIS LINE ***"
+        self.bindings[symbol] = value
         # END PROBLEM 3
 
     def lookup(self, symbol):
         """Return the value bound to SYMBOL. Errors if SYMBOL is not found."""
         # BEGIN PROBLEM 3
-        "*** REPLACE THIS LINE ***"
+        if symbol in self.bindings:
+            return self.bindings[symbol]
+        if self.parent is not None:
+            return self.parent.lookup(symbol)
         # END PROBLEM 3
         raise SchemeError('unknown identifier: {0}'.format(symbol))
 
@@ -135,7 +141,12 @@ class PrimitiveProcedure(Procedure):
             python_args.append(args.first)
             args = args.second
         # BEGIN PROBLEM 4
-        "*** REPLACE THIS LINE ***"
+        try:
+            if self.use_env:
+                python_args.append(env)
+            return self.fn(*python_args)
+        except TypeError:
+            raise SchemeError('incorrect number of arguments')
         # END PROBLEM 4
 
 class UserDefinedProcedure(Procedure):
@@ -196,7 +207,9 @@ def do_define_form(expressions, env):
     if scheme_symbolp(target):
         check_form(expressions, 2, 2)
         # BEGIN PROBLEM 6
-        "*** REPLACE THIS LINE ***"
+        name, expr = expressions.first, expressions.second.first
+        env.define(name, scheme_eval(expr, env))
+        return name
         # END PROBLEM 6
     elif isinstance(target, Pair) and scheme_symbolp(target.first):
         # BEGIN PROBLEM 10
@@ -210,7 +223,7 @@ def do_quote_form(expressions, env):
     """Evaluate a quote form."""
     check_form(expressions, 1, 1)
     # BEGIN PROBLEM 7
-    "*** REPLACE THIS LINE ***"
+    return expressions.first
     # END PROBLEM 7
 
 def do_begin_form(expressions, env):
@@ -238,13 +251,25 @@ def do_if_form(expressions, env):
 def do_and_form(expressions, env):
     """Evaluate a short-circuited and form."""
     # BEGIN PROBLEM 13
-    "*** REPLACE THIS LINE ***"
+    if expressions == nil:
+        return True
+    val = scheme_eval(expressions.first, env)
+    if expressions.second == nil and scheme_truep(val):
+        return val
+    elif scheme_falsep(val):
+        return False
+    return do_and_form(expressions.second, env)
     # END PROBLEM 13
 
 def do_or_form(expressions, env):
     """Evaluate a short-circuited or form."""
     # BEGIN PROBLEM 13
-    "*** REPLACE THIS LINE ***"
+    if expressions == nil:
+        return False
+    val = scheme_eval(expressions.first, env)
+    if scheme_truep(val):
+        return val
+    return do_or_form(expressions.second, env)
     # END PROBLEM 13
 
 def do_cond_form(expressions, env):
