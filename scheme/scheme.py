@@ -31,7 +31,7 @@ def scheme_eval(expr, env, _=None): # Optional third argument is ignored
         return SPECIAL_FORMS[first](rest, env)
     else:
         # BEGIN PROBLEM 5
-        operator = env.lookup(first)
+        operator = scheme_eval(first, env)
         check_procedure(operator)
         operands = rest.map(lambda x: scheme_eval(x, env))
         return scheme_apply(operator, operands, env)
@@ -52,9 +52,8 @@ def eval_all(expressions, env):
     # BEGIN PROBLEM 8
     if expressions == nil:
         return None
-    while expressions.second != nil:
-        # print(expressions.second)
-        scheme_eval(expressions.first, env, True)
+    if expressions.second != nil:
+        scheme_eval(expressions.first, env)
         return eval_all(expressions.second, env)
     else: 
         return scheme_eval(expressions.first, env)
@@ -190,7 +189,7 @@ class LambdaProcedure(UserDefinedProcedure):
         # print(self.formals)
         # print(args)
         new_frame = self.env.make_child_frame(self.formals, args)
-        return new_frame.bindings
+        return new_frame
         # END PROBLEM 12
 
     def __str__(self):
@@ -305,7 +304,10 @@ def do_cond_form(expressions, env):
             test = scheme_eval(clause.first, env)
         if scheme_truep(test):
             # BEGIN PROBLEM 14
-            return eval_all(clause.second, env)
+            val = eval_all(clause.second, env)
+            if val is None:
+                return test
+            return val
             # END PROBLEM 14
         expressions = expressions.second
 
@@ -324,11 +326,14 @@ def make_let_frame(bindings, env):
         raise SchemeError('bad bindings list in let form')
     # BEGIN PROBLEM 15
     symbols, values = nil, nil
-    for binding in bindings:
-        check_form(binding, 2, 2)
-        check_formals(binding.second)
-        symbols = Pair(binding.first, symbols)
-        values = Pair(scheme_eval(binding.second, env), values)
+    binding = bindings
+    while binding is not nil:
+        bind = binding.first
+        check_form(bind, 2, 2)
+        symbols = Pair(bind.first, symbols)
+        values = Pair(scheme_eval(bind.second.first, env), values)
+        binding = binding.second
+    check_formals(symbols)
     return env.make_child_frame(symbols, values)
     # END PROBLEM 15
 
@@ -408,7 +413,8 @@ class MuProcedure(UserDefinedProcedure):
         self.body = body
 
     # BEGIN PROBLEM 16
-    "*** REPLACE THIS LINE ***"
+    def make_call_frame(self, args, env):
+        return env.make_child_frame(self.formals, args)
     # END PROBLEM 16
 
     def __str__(self):
@@ -424,7 +430,7 @@ def do_mu_form(expressions, env):
     formals = expressions.first
     check_formals(formals)
     # BEGIN PROBLEM 16
-    "*** REPLACE THIS LINE ***"
+    return MuProcedure(formals, expressions.second)
     # END PROBLEM 16
 
 SPECIAL_FORMS['mu'] = do_mu_form
