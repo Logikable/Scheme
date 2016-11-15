@@ -305,7 +305,7 @@ def do_cond_form(expressions, env):
             test = scheme_eval(clause.first, env)
         if scheme_truep(test):
             # BEGIN PROBLEM 14
-            "*** REPLACE THIS LINE ***"
+            return eval_all(clause.second, env)
             # END PROBLEM 14
         expressions = expressions.second
 
@@ -323,7 +323,13 @@ def make_let_frame(bindings, env):
     if not scheme_listp(bindings):
         raise SchemeError('bad bindings list in let form')
     # BEGIN PROBLEM 15
-    "*** REPLACE THIS LINE ***"
+    symbols, values = nil, nil
+    for binding in bindings:
+        check_form(binding, 2, 2)
+        check_formals(binding.second)
+        symbols = Pair(binding.first, symbols)
+        values = Pair(scheme_eval(binding.second, env), values)
+    return env.make_child_frame(symbols, values)
     # END PROBLEM 15
 
 SPECIAL_FORMS = {
