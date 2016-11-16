@@ -17,11 +17,7 @@
 ))
 
 (define (zip pairs)
-  (if (null? pairs) nil
-    (define one (cons-all (lambda (x) (car x)) pairs))
-    (define two (cons-all (lambda (s) (cadr s)) pairs))
-    )
-  (cons one two)
+  (list (map car pairs) (map cadr pairs))
   ; (list one two)
 )
 
@@ -78,22 +74,29 @@
                (params (cadr expr))
                (body   (cddr expr)))
            ; BEGIN PROBLEM 19
-
-           (print expr)
-           (print 1)
+           ; (print "hit1")
+           (cons form(cons params (let-to-lambda body)))
+           ; (list (car expr)(let-to-lambda(cdr expr)))
            ; END PROBLEM 19
            ))
         ((let? expr)
          (let ((values (cadr expr))
                (body   (cddr expr)))
            ; BEGIN PROBLEM 19
-           (cons (lambda (cons (caar values) (cons (cdar values) nil)) body) (cons (cadr values) (cons (cddr values) nil))) 
-           (print values)
-           (print body)
+           ; (print "hit2")
+           (append (list (let-to-lambda (list 'lambda (car (zip values)) (car body)))) (let-to-lambda (cadr (zip values))))
+           ; (list 'lambda body)
+           ; (print body)
+           ; (print values)
+           ; (print (car (zip values)))
+           ; (print (cadr (zip values)))
+           ; (map print (cadr (zip values)))
+
            ; END PROBLEM 19
            ))
         (else
          ; BEGIN PROBLEM 19
-         expr
+         ; (print "hit3")
+         (map let-to-lambda expr)
          ; END PROBLEM 19
          )))
