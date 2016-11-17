@@ -272,12 +272,14 @@ def do_and_form(expressions, env):
     # BEGIN PROBLEM 13
     if expressions == nil:
         return True
-    val = scheme_eval(expressions.first, env)
-    if expressions.second == nil and scheme_truep(val):
-        return val
-    elif scheme_falsep(val):
-        return False
-    return do_and_form(expressions.second, env)
+    while expressions.second != nil:
+        expr = scheme_eval(expressions.first, env)
+        if scheme_truep(expr):
+            pass
+        else:
+            return expr
+        expressions = expressions.second
+    return scheme_eval(expressions.first, env, True)
     # END PROBLEM 13
 
 def do_or_form(expressions, env):
@@ -285,10 +287,14 @@ def do_or_form(expressions, env):
     # BEGIN PROBLEM 13
     if expressions == nil:
         return False
-    val = scheme_eval(expressions.first, env)
-    if scheme_truep(val):
-        return val
-    return do_or_form(expressions.second, env)
+    while expressions.second != nil:
+        expr = scheme_eval(expressions.first, env)
+        if scheme_truep(expr):
+            return expr
+        else:
+            pass
+        expressions = expressions.second
+    return scheme_eval(expressions.first, env, True)
     # END PROBLEM 13
 
 def do_cond_form(expressions, env):
@@ -516,7 +522,6 @@ def scheme_optimized_eval(expr, env, tail=False):
         else:
             # BEGIN Extra Credit
             operator = scheme_optimized_eval(first, env)
-            check_procedure(operator)
             operands = rest.map(lambda x: scheme_optimized_eval(x, env))
             result = scheme_apply(operator, operands, env)
             # END Extra Credit

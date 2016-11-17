@@ -10,6 +10,59 @@
 ;;; *** Add more of your own here! ***
 ;;; **********************************
 
+(+ 95 63)
+; expect 158
+(* 5 4 3)
+; expect 60
+(even? 101)
+; expect False
+(/ 5 1)
+; expect 5
+(+ (* 5 3) 3 4)
+; expect 22
+
+(define eleven (+ 1 (* 2 5)))
+; expect eleven
+(define x 20)
+; expect x
+(define thirty-one (+ eleven x))
+; expect thirty-one
+
+(quote world)
+; expect world
+'world
+; expect world
+(quote (1 . (3 . (nil))))
+; expect (1 3 ())
+'(1 2 . (7))
+; expect (1 2 7)
+
+(begin (* 3) (+ 5 6))
+; expect 11
+(begin (+ 2 3) '(print eleven))
+; expect (print eleven)
+
+(lambda (a b) (* a b))
+; expect (lambda (a b) (* a b))
+
+(and)
+; expect True
+(or)
+; expect False
+(and False (/ 10 0))
+; expect False
+
+(cond (False (/ 1 0)) (False (/ 1 0)))
+; expect 
+
+(let ((x 50) (y 10)) (* x y))
+; expect 500
+
+(define f (mu (g) (+ g h)))
+; expect f
+((mu (h) (f 10)) 10)
+; expect 20
+
 ;;; These are examples from several sections of "The Structure
 ;;; and Interpretation of Computer Programs" by Abelson and Sussman.
 
@@ -58,7 +111,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Move the following (exit) line to run additional tests. ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(exit)
 
 
 ;;; 1.1.2
@@ -606,3 +658,5 @@ one-through-four
               (sum (- m 1) (+ m total)))))))))
 (sum 1001 0)
 ; expect 501501
+
+(exit)
