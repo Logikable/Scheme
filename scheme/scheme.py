@@ -56,7 +56,7 @@ def eval_all(expressions, env):
         scheme_eval(expressions.first, env)
         return eval_all(expressions.second, env)
     else: 
-        return scheme_eval(expressions.first, env)
+        return scheme_eval(expressions.first, env, True)
     # END PROBLEM 8
 
 ################
@@ -263,9 +263,9 @@ def do_if_form(expressions, env):
     """Evaluate an if form."""
     check_form(expressions, 2, 3)
     if scheme_truep(scheme_eval(expressions.first, env)):
-        return scheme_eval(expressions.second.first, env)
+        return scheme_eval(expressions.second.first, env, True)
     elif len(expressions) == 3:
-        return scheme_eval(expressions.second.second.first, env)
+        return scheme_eval(expressions.second.second.first, env, True)
 
 def do_and_form(expressions, env):
     """Evaluate a short-circuited and form."""
@@ -500,7 +500,7 @@ def scheme_optimized_eval(expr, env, tail=False):
 
     if tail:
         # BEGIN Extra Credit
-        "*** REPLACE THIS LINE ***"
+        return Thunk(expr, env)
         # END Extra Credit
     else:
         result = Thunk(expr, env)
@@ -515,14 +515,17 @@ def scheme_optimized_eval(expr, env, tail=False):
             result = SPECIAL_FORMS[first](rest, env)
         else:
             # BEGIN Extra Credit
-            "*** REPLACE THIS LINE ***"
+            operator = scheme_optimized_eval(first, env)
+            check_procedure(operator)
+            operands = rest.map(lambda x: scheme_optimized_eval(x, env))
+            result = scheme_apply(operator, operands, env)
             # END Extra Credit
     return result
 
 ################################################################
 # Uncomment the following line to apply tail call optimization #
 ################################################################
-# scheme_eval = scheme_optimized_eval
+scheme_eval = scheme_optimized_eval
 
 
 ################
