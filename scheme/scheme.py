@@ -229,8 +229,9 @@ def do_define_form(expressions, env):
         # END PROBLEM 6
     elif isinstance(target, Pair) and scheme_symbolp(target.first):
         # BEGIN PROBLEM 10
-        # print(expressions)
-        env.define(target.first, do_lambda_form(Pair(target.second, expressions.second), env))
+        func_name = target.first
+        function_pair = Pair(target.second, expressions.second)
+        env.define(func_name, do_lambda_form(function_pair, env))
         return target.first
         # END PROBLEM 10
     else:
